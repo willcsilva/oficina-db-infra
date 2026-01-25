@@ -1,7 +1,7 @@
 # 2. Grupo de Subnets do RDS
 resource "aws_db_subnet_group" "oficina_db_sng" {
   # Mude de 'name' para 'name_prefix'
-  name_prefix = "oficina-db-sng-" 
+  name = "oficina-db-subnet-group" 
   subnet_ids  = data.terraform_remote_state.vpc.outputs.private_subnets
 
   tags = {
@@ -11,7 +11,7 @@ resource "aws_db_subnet_group" "oficina_db_sng" {
 
 # 3. Security Group para o RDS
 resource "aws_security_group" "rds_sg" {
-  name_prefix        = "rds-sg-oficina"
+  name        = "rds-sg-oficina"
   description = "Permite acesso de dentro da VPC ao Postgres"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
