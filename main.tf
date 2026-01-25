@@ -1,9 +1,10 @@
 # Este bloco lê as saídas (outputs) do seu repositório de rede
-data "terraform_remote_state" "vpc" {
+data "terraform_remote_state" "network" {
   backend = "s3"
+
   config = {
     bucket = "s3-bucket-willow"
-    key    = "state/eks/vpc/tf-state" # Certifique-se que este é o caminho do repo oficina-k8s-infra 
+    key    = "state/network/terraform.tfstate" # O caminho que você acabou de criar
     region = "us-east-2"
   }
 }

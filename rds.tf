@@ -1,28 +1,32 @@
-# 2. Grupo de Subnets do RDS
-resource "aws_db_subnet_group" "oficina_db_sng" {
-  # Mude de 'name' para 'name_prefix'
-  name       = "oficina-db-subnet-group"
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
-
-  tags = {
-    Name = "Oficina DB Subnet Group"
+# 1. Busca os dados da rede que você acabou de criar
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config = {
+    bucket = "s3-bucket-willow"
+    key    = "state/network/terraform.tfstate"
+    region = "us-east-2"
   }
 }
 
-# 3. Security Group para o RDS
+# 2. Usa os IDs dinâmicos nos recursos
+resource "aws_db_subnet_group" "oficina_db_sng" {
+  name       = "oficina-db-subnet-group"
+  # Aqui ele pega a lista de subnets que apareceu no seu log!
+  subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
+}
+
 resource "aws_security_group" "rds_sg" {
   name        = "rds-sg-oficina"
-  description = "Permite acesso de dentro da VPC ao Postgres"
-  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
 
   ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    # Permite tráfego de toda a CIDR da VPC (Garante que o EKS consiga conectar)
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    # Permite apenas tráfego vindo de dentro da sua VPC (segurança!)
+    cidr_blocks = [data.terraform_remote_state.network.outputs.vpc_cidr_block]
   }
-
+  
   egress {
     from_port   = 0
     to_port     = 0
