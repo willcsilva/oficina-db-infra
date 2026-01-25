@@ -20,3 +20,8 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -input=false -var-file="development.tfvars"
+
+      - name: Terraform Apply
+        # Garante que o apply só rode na branch main após o merge/push
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false -var-file="development.tfvars"
