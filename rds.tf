@@ -1,7 +1,7 @@
 # 2. Grupo de Subnets do RDS
 resource "aws_db_subnet_group" "oficina_db_sng" {
   name       = "oficina-db-subnet-group"
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets 
+  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
 
   tags = {
     Name = "Oficina DB Subnet Group"
@@ -15,9 +15,9 @@ resource "aws_security_group" "rds_sg" {
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
     # Permite tráfego de toda a CIDR da VPC (Garante que o EKS consiga conectar)
     cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
   }
@@ -32,18 +32,18 @@ resource "aws_security_group" "rds_sg" {
 
 # 4. Instância RDS PostgreSQL
 resource "aws_db_instance" "oficina_db" {
-  identifier           = "db-oficina-api-13-soat"
-  engine               = "postgres"
-  engine_version       = "15"
-  instance_class       = "db.t3.micro"
-  allocated_storage    = 20
-  db_name              = "db_oficina"
-  username             = "postgres"
-  password             = var.db_password
-  
+  identifier        = "db-oficina-api-13-soat"
+  engine            = "postgres"
+  engine_version    = "15"
+  instance_class    = "db.t3.micro"
+  allocated_storage = 20
+  db_name           = "db_oficina"
+  username          = "postgres"
+  password          = var.db_password
+
   db_subnet_group_name   = aws_db_subnet_group.oficina_db_sng.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  
+
   auto_minor_version_upgrade = true
   skip_final_snapshot        = true
   publicly_accessible        = false

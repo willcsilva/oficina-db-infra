@@ -1,29 +1,11 @@
-variable "db_password" {
-  type      = string
-  sensitive = true
-}
-
-variable "db_instance_class" {
-  type = string
-}
-
-variable "project_name" {
-  type = string
-}
-
-variable "db_username" {
-  type = string
-}
-
-variable "region" {
-  type    = string
-  default = "us-east-2"
-}
-
-variable "environment" {
-  type = string
-}
-
-variable "managed_by" {
-  type = string
-}
+variable "region" { default = "us-east-2" }
+variable "project_name" {}
+variable "environment" {}
+variable "managed_by" {}
+variable "db_password" { sensitive = true }
+variable "db_username" {}
+variable "db_name" {}
+variable "db_engine" {}
+variable "db_engine_version" {}
+variable "db_instance_class" {}
+variable "db_allocated_storage" {}
