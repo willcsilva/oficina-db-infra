@@ -1,6 +1,6 @@
 # 2. Usa os IDs dinâmicos nos recursos
 resource "aws_db_subnet_group" "oficina_db_sng" {
-  name       = "oficina-db-subnet-group"
+  name_prefix       = "oficina-db-sng-"
   # Aqui ele pega a lista de subnets que apareceu no seu log!
   subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
 }
