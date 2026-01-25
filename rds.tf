@@ -1,13 +1,3 @@
-# 1. Busca os dados da rede que você acabou de criar
-data "terraform_remote_state" "network" {
-  backend = "s3"
-  config = {
-    bucket = "s3-bucket-willow"
-    key    = "state/network/terraform.tfstate"
-    region = "us-east-2"
-  }
-}
-
 # 2. Usa os IDs dinâmicos nos recursos
 resource "aws_db_subnet_group" "oficina_db_sng" {
   name       = "oficina-db-subnet-group"
