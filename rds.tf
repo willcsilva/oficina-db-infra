@@ -1,8 +1,8 @@
 # 2. Grupo de Subnets do RDS
 resource "aws_db_subnet_group" "oficina_db_sng" {
   # Mude de 'name' para 'name_prefix'
-  name = "oficina-db-subnet-group" 
-  subnet_ids  = data.terraform_remote_state.vpc.outputs.private_subnets
+  name       = "oficina-db-subnet-group"
+  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
 
   tags = {
     Name = "Oficina DB Subnet Group"

@@ -8,6 +8,14 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
+terraform {
+  backend "s3" {
+    bucket = "s3-bucket-willow" # O nome do seu bucket
+    key    = "state/db/terraform.tfstate" # O caminho dentro do bucket
+    region = "us-east-2"
+  }
+}
+
 provider "aws" {
   region = "us-east-2"
 }
