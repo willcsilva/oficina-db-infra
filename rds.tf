@@ -48,12 +48,3 @@ resource "aws_db_instance" "oficina_db" {
     Project = "Oficina-api-13-soat"
   }
 }
-
-# --- OUTPUTS PARA A ESTEIRA ----
-output "rds_endpoint" {
-  value = aws_db_instance.oficina_db.endpoint
-}
-
-output "rds_hostname" {
-  value = split(":", aws_db_instance.oficina_db.endpoint)[0]
-}
