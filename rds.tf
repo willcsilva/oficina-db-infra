@@ -22,9 +22,10 @@ resource "aws_db_subnet_group" "oficina_db_sng" {
 
 # 3. Security Group do RDS
 resource "aws_security_group" "rds_sg" {
-  name        = "rds-sg-oficina"
-  vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
+  name   = "rds-sg-oficina"
+  vpc_id = data.terraform_remote_state.network.outputs.vpc_id
 
+  # Regra para o range da VPC (Backup de segurança)
   ingress {
     from_port   = 5432
     to_port     = 5432
@@ -32,15 +33,19 @@ resource "aws_security_group" "rds_sg" {
     cidr_blocks = [data.terraform_remote_state.network.outputs.vpc_cidr_block]
   }
 
+  # Regra Dinâmica: Permite acesso de ambos os SGs do EKS
   ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [data.terraform_remote_state.eks.outputs.cluster_security_group_id]
-    # REMOVIDO ACENTO: Acesso dinamico dos nodes do cluster EKS
-    description     = "Acesso dinamico dos nodes do cluster EKS"
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    # Agora passamos os dois IDs como uma lista
+    security_groups = [
+      data.terraform_remote_state.eks.outputs.cluster_primary_security_group_id,
+      data.terraform_remote_state.eks.outputs.node_security_group_id
+    ]
+    description = "Acesso do Control Plane e dos Nodes do EKS"
   }
-  
+
   egress {
     from_port   = 0
     to_port     = 0
