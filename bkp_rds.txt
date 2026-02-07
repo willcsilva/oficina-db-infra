@@ -1,26 +1,10 @@
-# Caminho: rds.tf
-
-# 1. Busca os dados do cluster EKS para obter o SG ID dinamicamente
-data "terraform_remote_state" "eks" {
-  backend = "s3"
-  config = {
-    bucket = "s3-bucket-willow"
-    key    = "state/eks/terraform.tfstate"
-    region = "us-east-2"
-  }
-}
-
-# NOTA: O bloco data "terraform_remote_state" "network" deve ficar APENAS no main.tf
-# para evitar o erro de "Duplicate data" que você recebeu.
-
-# 2. Grupo de Subnets para o banco
+# 2. Usa os IDs dinâmicos nos recursos
 resource "aws_db_subnet_group" "oficina_db_sng" {
-  name_prefix = "oficina-db-sng-"
-  # Referenciando o data source que está declarado no seu main.tf
+  name_prefix       = "oficina-db-sng-"
+  # Aqui ele pega a lista de subnets que apareceu no seu log!
   subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
 }
 
-# 3. Security Group do RDS
 resource "aws_security_group" "rds_sg" {
   name        = "rds-sg-oficina"
   vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
@@ -29,16 +13,8 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
+    # Permite apenas tráfego vindo de dentro da sua VPC (segurança!)
     cidr_blocks = [data.terraform_remote_state.network.outputs.vpc_cidr_block]
-  }
-
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [data.terraform_remote_state.eks.outputs.cluster_security_group_id]
-    # REMOVIDO ACENTO: Acesso dinamico dos nodes do cluster EKS
-    description     = "Acesso dinamico dos nodes do cluster EKS"
   }
   
   egress {
@@ -46,10 +22,6 @@ resource "aws_security_group" "rds_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "rds-sg-oficina"
   }
 }
 
