@@ -10,9 +10,6 @@ data "terraform_remote_state" "eks" {
   }
 }
 
-# NOTA: O bloco data "terraform_remote_state" "network" deve ficar APENAS no main.tf
-# para evitar o erro de "Duplicate data" que você recebeu.
-
 # 2. Grupo de Subnets para o banco
 resource "aws_db_subnet_group" "oficina_db_sng" {
   name_prefix = "oficina-db-sng-"
@@ -20,30 +17,17 @@ resource "aws_db_subnet_group" "oficina_db_sng" {
   subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
 }
 
-# 3. Security Group do RDS
+# 3. Security Group do RDS DESACOPLADO
 resource "aws_security_group" "rds_sg" {
   name   = "rds-sg-oficina"
   vpc_id = data.terraform_remote_state.network.outputs.vpc_id
 
-  # Regra para o range da VPC (Backup de segurança)
-  ingress {
+ ingress {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
     cidr_blocks = [data.terraform_remote_state.network.outputs.vpc_cidr_block]
-  }
-
-  # Regra Dinâmica: Permite acesso de ambos os SGs do EKS
-  ingress {
-    from_port = 5432
-    to_port   = 5432
-    protocol  = "tcp"
-    # Agora passamos os dois IDs como uma lista
-    security_groups = [
-      data.terraform_remote_state.eks.outputs.cluster_primary_security_group_id,
-      data.terraform_remote_state.eks.outputs.node_security_group_id
-    ]
-    description = "Acesso do Control Plane e dos Nodes do EKS"
+    description = "Acesso de qualquer recurso dentro da VPC"
   }
 
   egress {
