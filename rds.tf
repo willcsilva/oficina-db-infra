@@ -65,7 +65,3 @@ resource "aws_db_instance" "oficina_db" {
     Project = "Oficina-api-13-soat"
   }
 }
-
-# output "rds_hostname" {
-#   value = split(":", aws_db_instance.oficina_db.endpoint)[0]
-# }
