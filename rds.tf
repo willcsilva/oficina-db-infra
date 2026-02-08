@@ -66,6 +66,6 @@ resource "aws_db_instance" "oficina_db" {
   }
 }
 
-output "rds_hostname" {
-  value = split(":", aws_db_instance.oficina_db.endpoint)[0]
-}
+# output "rds_hostname" {
+#   value = split(":", aws_db_instance.oficina_db.endpoint)[0]
+# }
