@@ -21,3 +21,7 @@ output "rds_security_group_id" {
   description = "O ID do Security Group vinculado ao RDS"
   value       = aws_security_group.rds_sg.id
 }
+output "db_instance_address" {
+  description = "O endpoint de conexao do banco de dados"
+  value       = aws_db_instance.oficina_db.address
+}
