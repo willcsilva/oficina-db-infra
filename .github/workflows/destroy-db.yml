@@ -1,15 +1,16 @@
-name: "Terraform Destroy DB"
+name: "Terraform Destroy Data Layer (RDS & DynamoDB)"
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Gatilho manual para limpeza total
 
 jobs:
   terraform-destroy:
-    name: "Destroy RDS"
+    name: "Destroy All Databases"
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-2 # Certifique-se de que é a região correta onde os recursos estão
       TF_VAR_db_password: ${{ secrets.RDS_PASSWORD }}
 
     steps:
@@ -18,9 +19,13 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Destroy
+        # O Terraform lerá o state e verá o RDS + as 2 tabelas DynamoDB
+        # e destruirá os 3 recursos em sequência.
         run: terraform destroy -auto-approve -input=false -var-file="development.tfvars"
